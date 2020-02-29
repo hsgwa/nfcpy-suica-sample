@@ -106,7 +106,7 @@ class HistoryRecord(object):
 
 
 def connected(tag):
-    print tag
+    print(tag)
 
     if isinstance(tag, nfc.tag.tt3.Type3Tag):
         try:
@@ -116,24 +116,24 @@ def connected(tag):
                 bc = nfc.tag.tt3.BlockCode(i, service=0)
                 data = tag.read_without_encryption([sc], [bc])
                 history = HistoryRecord(bytes(data))
-                print "=== %02d ===" % i
-                print "端末種: %s" % history.console
-                print "処理: %s" % history.process
-                print "日付: %02d-%02d-%02d" % (history.year, history.month,
-                                              history.day)
-                print "入線区: %s-%s" % (history.in_station.company_value,
-                                      history.in_station.line_value)
-                print "入駅順: %s" % history.in_station.station_value
-                print "出線区: %s-%s" % (history.out_station.company_value,
-                                      history.out_station.line_value)
-                print "出駅順: %s" % history.out_station.station_value
-                print "残高: %d" % history.balance
-                print "BIN: "
-                print "".join(['%02x ' % s for s in data])
+                print("=== %02d ===" % i)
+                print("端末種: %s" % history.console)
+                print("処理: %s" % history.process)
+                print("日付: %02d-%02d-%02d" %
+                      (history.year, history.month, history.day))
+                print("入線区: %s-%s" % (history.in_station.company_value,
+                                      history.in_station.line_value))
+                print("入駅順: %s" % history.in_station.station_value)
+                print("出線区: %s-%s" % (history.out_station.company_value,
+                                      history.out_station.line_value))
+                print("出駅順: %s" % history.out_station.station_value)
+                print("残高: %d" % history.balance)
+                print("BIN: ")
+                print("".join(['%02x ' % s for s in data]))
         except Exception as e:
-            print "error: %s" % e
+            print("error: %s" % e)
     else:
-        print "error: tag isn't Type3Tag"
+        print("error: tag isn't Type3Tag")
 
 
 if __name__ == "__main__":
