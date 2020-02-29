@@ -6,6 +6,7 @@ import binascii
 import os
 import struct
 import sys
+import datetime
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/nfcpy')
 
@@ -105,10 +106,45 @@ class HistoryRecord(object):
         return (date >> 0) & 0x1f
 
 
-def connected(tag):
-    print(tag)
+class Station():
+    def __init__(self, station, company, line):
+        self.station = station
+        self.company = company
+        self.line = line
 
-    if isinstance(tag, nfc.tag.tt3.Type3Tag):
+
+class SuicaRecord():
+    def __init__(self, history):
+        self.console = history.console
+        self.process = history.process
+        self.date = datetime.date(history.year, history.month, history.day)
+        self.in_station = Station(history.in_station.station_value,
+                                  history.in_station.company_value,
+                                  history.in_station.line_value)
+        self.out_station = Station(history.out_station.station_value,
+                                   history.out_station.company_value,
+                                   history.out_station.line_value)
+        self.balance = history.balance
+        self.payment = 0
+
+
+class Suica():
+    def __init__(self):
+        clf = nfc.ContactlessFrontend('usb')
+        self.data = []
+        clf.connect(rdwr={'on-connect': self.__connected})
+        self.__calculate_payment()
+
+    def __calculate_payment(self):
+        for record_, record in zip(self.data[:-1], self.data[1:]):
+            record.payment = record.balance - record_.balance
+
+    def __connected(self, tag):
+
+        if not isinstance(tag, nfc.tag.tt3.Type3Tag):
+            print("error: tag isn't Type3Tag")
+            return
+
         try:
             sc = nfc.tag.tt3.ServiceCode(service_code >> 6,
                                          service_code & 0x3f)
@@ -116,26 +152,23 @@ def connected(tag):
                 bc = nfc.tag.tt3.BlockCode(i, service=0)
                 data = tag.read_without_encryption([sc], [bc])
                 history = HistoryRecord(bytes(data))
-                print("=== %02d ===" % i)
-                print("端末種: %s" % history.console)
-                print("処理: %s" % history.process)
-                print("日付: %02d-%02d-%02d" %
-                      (history.year, history.month, history.day))
-                print("入線区: %s-%s" % (history.in_station.company_value,
-                                      history.in_station.line_value))
-                print("入駅順: %s" % history.in_station.station_value)
-                print("出線区: %s-%s" % (history.out_station.company_value,
-                                      history.out_station.line_value))
-                print("出駅順: %s" % history.out_station.station_value)
-                print("残高: %d" % history.balance)
-                print("BIN: ")
-                print("".join(['%02x ' % s for s in data]))
+                self.data.append(SuicaRecord(history))
+
         except Exception as e:
             print("error: %s" % e)
-    else:
-        print("error: tag isn't Type3Tag")
 
 
 if __name__ == "__main__":
-    clf = nfc.ContactlessFrontend('usb')
-    clf.connect(rdwr={'on-connect': connected})
+    suica = Suica()
+
+    for d in suica.data:
+        print()
+        print("支払い: %s円" % d.payment)
+        print("端末種: %s" % d.console)
+        print("処理: %s" % d.process)
+        print("日付: %02d-%02d-%02d" % (d.date.year, d.date.month, d.date.day))
+        print("入線区: %s-%s" % (d.in_station.company, d.in_station.line))
+        print("入駅順: %s" % d.in_station.station)
+        print("出線区: %s-%s" % (d.out_station.company, d.out_station.line))
+        print("出駅順: %s" % d.out_station.station)
+        print("残高: %d" % d.balance)
