@@ -134,6 +134,7 @@ class Suica():
         self.data = []
         clf.connect(rdwr={'on-connect': self.__connected})
         self.__calculate_payment()
+        self.data = self.data[1:]
 
     def __calculate_payment(self):
         for record_, record in zip(self.data[:-1], self.data[1:]):
