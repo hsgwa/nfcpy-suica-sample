@@ -62,7 +62,7 @@ class HistoryRecord(object):
         self.db = None
         self.console = self.get_console(row_be[0])
         self.process = self.get_process(row_be[1])
-        self.year = self.get_year(row_be[3])
+        self.year = self.get_year(row_be[3]) + 2000
         self.month = self.get_month(row_be[3])
         self.day = self.get_day(row_be[3])
         self.balance = row_le[8]
