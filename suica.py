@@ -46,7 +46,8 @@ class StationRecord(object):
     @classmethod
     def get_station(cls, line_key, station_key):
         # 線区コードと駅コードに対応するStationRecordを検索する
-        for station in cls.get_db("StationCode.csv"):
+        module_path = os.path.dirname(__file__)
+        for station in cls.get_db(module_path + "/StationCode.csv"):
             if station.line_key == line_key and station.station_key == station_key:
                 return station
         return cls.get_none()
