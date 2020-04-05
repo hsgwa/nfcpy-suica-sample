@@ -117,7 +117,7 @@ class SuicaRecord():
     def __init__(self, history):
         self.console = history.console
         self.process = history.process
-        self.date = datetime.date(history.year, history.month, history.day)
+        self.date = datetime.datetime(history.year, history.month, history.day)
         self.in_station = Station(history.in_station.station_value,
                                   history.in_station.company_value,
                                   history.in_station.line_value)
