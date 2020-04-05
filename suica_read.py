@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import csv
 import binascii
+import csv
+import datetime
 import os
 import struct
 import sys
-import datetime
-
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/nfcpy')
 
 import nfc
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/nfcpy')
 
 num_blocks = 20
 service_code = 0x090f
